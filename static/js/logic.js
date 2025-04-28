@@ -28,21 +28,11 @@ let basemap = {
   "Outdoors": outdoor
 };
 
-// Create the map object with center and zoom options.
-let map = L.map("map", {
-  center: [37.09, -95.71],
-  zoom: 5,
-  layers: [grayscale]
-});
-
-// Then add the 'basemap' tile layer to the map.
-
-let layerControl = L.control.layers(basemap).addTo(map);
-
 // OPTIONAL: Step 2
 // Create the layer groups, base maps, and overlays for our two sets of data, earthquakes and tectonic_plates.
 // Add a control to the map that will allow the user to change which layers are visible.
-
+let earthquakes = new L.LayerGroup();
+let tectonic_plates = new L.LayerGroup();
 
 // Make a request that retrieves the earthquake geoJSON data.
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(function (data) {
@@ -107,7 +97,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
     }
   // OPTIONAL: Step 2
   // Add the data to the earthquake layer instead of directly to the map.
-  }).addTo(map);
+  }).addTo(earthquakes);
 
   // Create a legend control object.
   let legend = L.control({
@@ -150,9 +140,24 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
   // Make a request to get our Tectonic Plate geoJSON data.
   d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json").then(function (plate_data) {
     // Save the geoJSON data, along with style information, to the tectonic_plates layer.
-
-
-    // Then add the tectonic_plates layer to the map.
+    L.geoJson(plate_data, {
+      color: "#ff6500",
+      weight: 2,
+      opacity: 1
+    }).addTo(tectonic_plates);
 
   });
 });
+
+// Create the map object with center and zoom options.
+let map = L.map("map", {
+  center: [37.09, -95.71],
+  zoom: 5,
+  layers: [grayscale, earthquakes]
+});
+
+let overlays = {
+  "Earthquakes": earthquakes,
+  "Tectonic Plates": tectonic_plates
+};
+let layerControl = L.control.layers(basemap, overlays).addTo(map);
