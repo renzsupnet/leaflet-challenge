@@ -156,8 +156,11 @@ let map = L.map("map", {
   layers: [grayscale, earthquakes]
 });
 
+// Create an overlay object to hold our overlay layers.
 let overlays = {
   "Earthquakes": earthquakes,
   "Tectonic Plates": tectonic_plates
 };
+
+// Create a control that will allow the user to change which base layer is visible.
 let layerControl = L.control.layers(basemap, overlays).addTo(map);
